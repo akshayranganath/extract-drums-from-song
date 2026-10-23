@@ -39,5 +39,3 @@ FFmpeg must be on `PATH` and include `libmp3lame`; VLC must be installed to use 
 - Preserve Electron `contextIsolation`, disabled `nodeIntegration`, and the restricted preload IPC surface.
 - Do not overwrite or delete existing audio files while testing. Use temporary synthetic fixtures, and do not commit generated audio or model weights.
 - Keep this file and `README.md` in sync with workflow changes. Run the checks above after code changes.
-
-`AGENT.md` is retained as a pointer to this canonical `AGENTS.md` guide.

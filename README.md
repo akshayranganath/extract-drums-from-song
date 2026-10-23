@@ -11,7 +11,6 @@ CLI/                  Python command-line backend
 electron/              Electron main process, preload bridge, and renderer UI
 tests/                 Python unit tests
 AGENTS.md              Canonical instructions for coding agents
-AGENT.md               Compatibility pointer to AGENTS.md
 pyproject.toml         Python project and uv dependencies
 package.json           Electron scripts and dependencies
 ```
