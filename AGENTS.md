@@ -11,6 +11,7 @@ Drum Extract is a local Electron app backed by a Python CLI. It accepts MP3 inpu
 - `electron/preload.cjs`: narrow IPC bridge. Do not expose raw `ipcRenderer` or Node APIs to the UI.
 - `electron/renderer/`: HTML, CSS, and renderer interactions.
 - `tests/`: Python unit tests.
+- `README.md`: what the project does and how to use the CLI and desktop app. `INSTALLATION.md`: setup steps, CLI first, then the Electron app.
 - `pyproject.toml` / `uv.lock`: Python dependencies; keep NumPy below 2 for the current PyTorch build.
 - `package.json` / `package-lock.json`: Electron dependencies and scripts.
 
@@ -38,4 +39,4 @@ FFmpeg must be on `PATH` and include `libmp3lame`; VLC must be installed to use 
 - Launch Python, FFmpeg, and VLC with `spawn`/`subprocess` argument arrays; never pass file paths through a shell.
 - Preserve Electron `contextIsolation`, disabled `nodeIntegration`, and the restricted preload IPC surface.
 - Do not overwrite or delete existing audio files while testing. Use temporary synthetic fixtures, and do not commit generated audio or model weights.
-- Keep this file and `README.md` in sync with workflow changes. Run the checks above after code changes.
+- Keep this file, `README.md`, and `INSTALLATION.md` in sync with workflow changes. Run the checks above after code changes.

@@ -1,62 +1,53 @@
 # Drum Extract
 
-A local desktop app for separating drums from MP3 files. Electron provides the interface; the Python CLI in `CLI/` runs Demucs, then FFmpeg converts the selected WAV stem to an MP3. The WAV stem and other intermediate Demucs stems are temporary and cleaned up; VLC opens the final MP3.
+Separate the drums from an MP3, or remove them, entirely on your machine. Drum Extract runs [Demucs](https://github.com/facebookresearch/demucs) to split the track, then uses FFmpeg to encode the result as an MP3. Nothing is uploaded.
 
-## Project layout
+It can be used two ways:
 
-```text
-CLI/                  Python command-line backend
-  drum_extract.py
-  __init__.py
-electron/              Electron main process, preload bridge, and renderer UI
-tests/                 Python unit tests
-docs/screenshots/      README images
-AGENTS.md              Canonical instructions for coding agents
-pyproject.toml         Python project and uv dependencies
-package.json           Electron scripts and dependencies
-```
-
-## Requirements
-
-- Python 3.12 or newer and `uv`
-- Node.js and npm
-- FFmpeg installed and available on `PATH`, with the `libmp3lame` encoder
-- VLC installed to play the result in VLC
-
-## Set up
-
-From the project directory, install the Python and Electron dependencies once:
-
-```bash
-uv sync
-npm install
-```
-
-`uv sync` creates `.venv/`, which the Electron app uses to run the Python backend. If you later see "The Python environment is missing" in the app, re-run `uv sync`.
-
-## Using the desktop app
-
-Launch the app with:
-
-```bash
-npm start
-```
-
-`npm start` runs `electron .` and loads `electron/main.cjs`. It is the only launch script; there is no separate `dev` script, and the app has no build step, so edit the files under `electron/` and restart to see changes. `npm run check` syntax-checks the Electron sources.
+- **Command line** — a `drum-extract` command backed by Python.
+- **Desktop app** — an Electron window with drag-and-drop, a progress bar, and one-click playback in VLC. The app is a thin shell around the same CLI.
 
 ![Initial Drum Extract window](docs/screenshots/01-start.png)
 
-*The app before selecting a song.*
+## Installation
 
-Then, in the window:
+See **[INSTALLATION.md](INSTALLATION.md)**. It covers the shared prerequisites, the CLI-only setup, and the extra steps for the desktop app.
 
-1. **Pick a song.** Drag an MP3 onto the drop zone, or click **Choose MP3** to open a file dialog. Only `.mp3` files are accepted; video files are rejected.
-2. **Choose what to keep.** In the dropdown, select **Drums only** (isolated drum stem) or **Everything except drums** (the mix with drums removed).
-3. **Separate.** Click **Separate audio**. A save dialog opens first, pre-filled with `<song>_drums.mp3` or `<song>_no_drums.mp3` beside the input; pick a location and confirm. Cancelling the save dialog aborts without processing.
-4. **Wait.** The progress bar follows Demucs inference, holds at 97% while FFmpeg encodes, and reaches 100% only after the final MP3 has been written. The first run downloads the `htdemucs` model, which takes a little longer. Click **Cancel** to stop an in-progress separation; nothing is written when you cancel.
-5. **Listen.** Click **Open result in VLC** to play the saved MP3. VLC must be installed.
+Quick version, once Python 3.12+, `uv`, and FFmpeg are installed:
 
-### What it looks like
+```bash
+uv sync                                        # CLI (required for both)
+uv run drum-extract song.mp3 --mode drums
+
+npm install && npm start                       # desktop app (optional)
+```
+
+## Command-line use
+
+```bash
+uv run drum-extract song.mp3 --mode drums       # isolated drum stem  -> song_drums.mp3
+uv run drum-extract song.mp3 --mode no-drums    # mix without drums   -> song_no_drums.mp3
+```
+
+| Option | Description |
+|---|---|
+| `--mode drums` / `--mode no-drums` | Required. Keep only the drums, or everything except the drums. |
+| `--output PATH.mp3` | Where to write the result. Default: `<input>_<mode>.mp3` beside the input. |
+| `--overwrite` | Replace the output file if it already exists. |
+| `--device auto\|cpu\|mps\|cuda` | Default `auto` picks CUDA, then Apple MPS, then CPU, and retries on CPU if the GPU run fails. An explicitly chosen device is not retried. |
+| `--model NAME` | Demucs model. Default `htdemucs`; `htdemucs_ft` is slower but slightly better. |
+
+Input must be an `.mp3` file; output is always an `.mp3`. The first run downloads the model weights.
+
+## Using the desktop app
+
+Launch with `npm start`, then:
+
+1. **Pick a song.** Drag an MP3 onto the drop zone, or click **Choose MP3**. Only `.mp3` files are accepted.
+2. **Choose what to keep.** Select **Drums only** or **Everything except drums**.
+3. **Separate.** Click **Separate audio**. A save dialog opens, pre-filled with `<song>_drums.mp3` or `<song>_no_drums.mp3` beside the input. Cancelling the dialog aborts without processing.
+4. **Wait.** The progress bar follows Demucs, holds at 97% while FFmpeg encodes, and reaches 100% only once the MP3 is written. **Cancel** stops the run; nothing is written when you cancel.
+5. **Listen.** Click **Open result in VLC**.
 
 ![MP3 selected and ready to separate](docs/screenshots/02-file-selected.png)
 
@@ -70,33 +61,34 @@ Then, in the window:
 
 *The completed MP3 can be opened in VLC.*
 
-The app always uses `--device auto` (CUDA, then Apple Metal/MPS, then CPU) and falls back to CPU automatically if the GPU run fails. On an Apple Silicon Mac a four-minute song takes roughly 20 seconds on MPS versus over a minute on CPU.
+The app always uses `--device auto`. On an Apple Silicon Mac a four-minute song takes roughly 20 seconds on MPS versus over a minute on CPU.
 
-On macOS, closing the window leaves the app running in the Dock, following the platform convention; press Cmd+Q (or stop `npm start` in the terminal) to quit. On Windows and Linux, closing the window quits. Quitting during a separation terminates the backend and cleans up its temporary files.
+On macOS, closing the window leaves the app in the Dock; press Cmd+Q (or stop `npm start`) to quit. On Windows and Linux, closing the window quits. Quitting mid-run terminates the backend and cleans up its temporary files.
 
-Audio is processed locally and is not uploaded. The temporary WAV, unused Demucs stems, and any failed partial MP3 are cleaned up; only a successfully converted MP3 is kept. FFmpeg is used to encode the WAV stem because it is much faster than Demucs' built-in `lameenc` MP3 path.
+## How it works
 
-## Command-line use
+1. Demucs (`--two-stems=drums`) writes WAV stems to a temporary directory.
+2. FFmpeg encodes the selected stem to MP3 with `libmp3lame` (much faster than Demucs' built-in `lameenc` path).
+3. The MP3 is moved atomically into place; the temporary WAVs, unused stems, and any partial output are deleted on both success and failure.
 
-```bash
-uv run drum-extract song.mp3 --mode drums
-uv run drum-extract song.mp3 --mode no-drums
-uv run drum-extract song.mp3 --mode drums --device auto
+Source separation is approximate and may leave drum bleed or other artifacts.
+
+## Project layout
+
+```text
+CLI/                  Python command-line backend (drum_extract.py)
+electron/             Electron main process, preload bridge, and renderer UI
+tests/                Python unit tests
+docs/screenshots/     README images
+INSTALLATION.md       Setup instructions for the CLI and the desktop app
+AGENTS.md             Instructions for coding agents
+pyproject.toml        Python project and uv dependencies
+package.json          Electron scripts and dependencies
 ```
 
-Or invoke the module directly:
-
-```bash
-uv run python CLI/drum_extract.py song.mp3 --mode drums
-```
-
-`--device` accepts `auto`, `cpu`, `mps`, or `cuda`; `auto` chooses CUDA, then MPS, then CPU, and retries on CPU if an automatic GPU run fails. An explicitly selected device is not retried. Use `--output path/to/result.mp3` to select an output path and `--overwrite` to replace an existing MP3. Use `--model htdemucs_ft` to try the slower fine-tuned model.
-
-## Checks
+## Development checks
 
 ```bash
 uv run python -m unittest discover -s tests -v
 npm run check
 ```
-
-Source separation is approximate and may leave drum bleed or other artifacts. NumPy is constrained below version 2 because the installed PyTorch build is not compatible with NumPy 2.x.

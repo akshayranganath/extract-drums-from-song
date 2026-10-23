@@ -3,5 +3,12 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 node_modules/
+# Audio: never commit user songs, stems, or generated output
 *.mp3
 *.wav
+*.flac
+*.m4a
+*.aac
+*.ogg
+*.aiff
+separated/
