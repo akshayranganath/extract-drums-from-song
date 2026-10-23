@@ -22,21 +22,40 @@ package.json           Electron scripts and dependencies
 - FFmpeg installed and available on `PATH`, with the `libmp3lame` encoder
 - VLC installed to play the result in VLC
 
-## Set up and launch
+## Set up
 
-From the project directory:
+From the project directory, install the Python and Electron dependencies once:
 
 ```bash
 uv sync
 npm install
+```
+
+`uv sync` creates `.venv/`, which the Electron app uses to run the Python backend. If you later see "The Python environment is missing" in the app, re-run `uv sync`.
+
+## Using the desktop app
+
+Launch the app with:
+
+```bash
 npm start
 ```
 
-Drop an MP3 into the app or click **Choose MP3**, select the desired output, click **Separate audio**, and choose where to save the MP3. The progress bar follows Demucs inference and then shows the FFmpeg encoding step. It reaches 100% only after the final MP3 has been written. Click **Open result in VLC** after it completes.
+`npm start` runs `electron .` and loads `electron/main.cjs`. It is the only launch script; there is no separate `dev` script, and the app has no build step, so edit the files under `electron/` and restart to see changes. `npm run check` syntax-checks the Electron sources.
 
-The audio is processed locally and is not uploaded. Demucs downloads its pretrained model on first use. The **Cancel** button stops an active separation, and quitting the app sends a termination signal to the processing process. The temporary WAV, unused Demucs stems, and any failed partial MP3 are cleaned up; only a successfully converted MP3 is kept.
+Then, in the window:
 
-FFmpeg is used to encode the WAV stem because it is much faster than Demucs' built-in `lameenc` MP3 path.
+1. **Pick a song.** Drag an MP3 onto the drop zone, or click **Choose MP3** to open a file dialog. Only `.mp3` files are accepted; video files are rejected.
+2. **Choose what to keep.** In the dropdown, select **Drums only** (isolated drum stem) or **Everything except drums** (the mix with drums removed).
+3. **Separate.** Click **Separate audio**. A save dialog opens first, pre-filled with `<song>_drums.mp3` or `<song>_no_drums.mp3` beside the input; pick a location and confirm. Cancelling the save dialog aborts without processing.
+4. **Wait.** The progress bar follows Demucs inference, holds at 97% while FFmpeg encodes, and reaches 100% only after the final MP3 has been written. The first run downloads the `htdemucs` model, which takes a little longer. Click **Cancel** to stop an in-progress separation; nothing is written when you cancel.
+5. **Listen.** Click **Open result in VLC** to play the saved MP3. VLC must be installed.
+
+The app always uses `--device auto` (CUDA, then Apple Metal/MPS, then CPU) and falls back to CPU automatically if the GPU run fails. On an Apple Silicon Mac a four-minute song takes roughly 20 seconds on MPS versus over a minute on CPU.
+
+On macOS, closing the window leaves the app running in the Dock, following the platform convention; press Cmd+Q (or stop `npm start` in the terminal) to quit. On Windows and Linux, closing the window quits. Quitting during a separation terminates the backend and cleans up its temporary files.
+
+Audio is processed locally and is not uploaded. The temporary WAV, unused Demucs stems, and any failed partial MP3 are cleaned up; only a successfully converted MP3 is kept. FFmpeg is used to encode the WAV stem because it is much faster than Demucs' built-in `lameenc` MP3 path.
 
 ## Command-line use
 
