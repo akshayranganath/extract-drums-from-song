@@ -1,0 +1,24 @@
+[project]
+name = "drum-extract"
+version = "0.1.0"
+description = "Separate drum stems from local MP3 files"
+readme = "README.md"
+authors = [
+    { email = "akshay.ranganath@glean.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "demucs>=4.1.0",
+    "numpy>=1.26.4,<2",
+]
+
+[project.scripts]
+drum-extract = "CLI.drum_extract:main"
+
+[build-system]
+requires = ["uv_build>=0.13.2,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "CLI"
+module-root = "."

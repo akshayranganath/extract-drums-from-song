@@ -1,0 +1,14 @@
+{
+  "name": "drum-extract-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A desktop interface for separating drums from MP3 files with Demucs",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check electron/main.cjs && node --check electron/preload.cjs && node --check electron/renderer/app.js"
+  },
+  "devDependencies": {
+    "electron": "^45.0.0"
+  }
+}

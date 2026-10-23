@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'" />
+    <title>Drum Extract</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="brand-mark" aria-hidden="true">D</div>
+        <div>
+          <p class="eyebrow">LOCAL AUDIO TOOL</p>
+          <h1>Drum Extract</h1>
+        </div>
+        <span class="local-badge"><span></span> Stays on your device</span>
+      </header>
+
+      <section class="intro">
+        <h2>Separate the drums from a song</h2>
+        <p>Choose an MP3, select what to keep, and save the result as an MP3.</p>
+      </section>
+
+      <section id="dropZone" class="drop-zone" aria-label="MP3 file selection area">
+        <div class="music-icon" aria-hidden="true">♫</div>
+        <p class="drop-title">Drop an MP3 here</p>
+        <p class="drop-subtitle">or choose a file from your computer</p>
+        <button id="browseButton" class="button button-secondary" type="button">Choose MP3</button>
+        <p id="selectedFile" class="selected-file" aria-live="polite">No file selected</p>
+      </section>
+
+      <section class="controls" aria-label="Separation options">
+        <label for="modeSelect">Output</label>
+        <select id="modeSelect">
+          <option value="drums">Drums only</option>
+          <option value="no-drums">Everything except drums</option>
+        </select>
+        <div class="control-actions">
+          <button id="separateButton" class="button button-primary" type="button" disabled>Separate audio</button>
+          <button id="cancelButton" class="button button-cancel" type="button" hidden disabled>Cancel</button>
+        </div>
+      </section>
+
+      <section class="progress-card" aria-label="Separation progress">
+        <div class="progress-heading">
+          <span id="statusText" role="status" aria-live="polite">Choose an MP3 to begin.</span>
+          <span id="percentText" class="percent">0%</span>
+        </div>
+        <progress id="progressBar" max="100" value="0">0%</progress>
+        <p id="outputText" class="output-text" hidden></p>
+      </section>
+
+      <div id="errorBox" class="error-box" role="alert" hidden></div>
+
+      <button id="vlcButton" class="button button-vlc" type="button" disabled>
+        <span class="play-icon" aria-hidden="true">▶</span>
+        Open result in VLC
+      </button>
+
+      <footer>
+        <p>Demucs processing runs locally. The first run may take longer while the model loads.</p>
+      </footer>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

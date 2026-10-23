@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000" fill="none">
+  <defs>
+    <linearGradient id="wave" x1="70" y1="600" x2="1370" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B7E45D" />
+      <stop offset=".48" stop-color="#7BC9B8" />
+      <stop offset="1" stop-color="#B99AFF" />
+    </linearGradient>
+    <radialGradient id="glowL" cx="0" cy="0" r="1" gradientTransform="matrix(400 330 -300 364 260 235)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B7E45D" stop-opacity=".2" />
+      <stop offset="1" stop-color="#B7E45D" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="glowR" cx="0" cy="0" r="1" gradientTransform="matrix(370 300 -280 345 1210 700)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9C8BFF" stop-opacity=".2" />
+      <stop offset="1" stop-color="#9C8BFF" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="260" cy="235" rx="440" ry="380" fill="url(#glowL)" />
+  <ellipse cx="1210" cy="700" rx="420" ry="360" fill="url(#glowR)" />
+
+  <!-- Flowing staff lines suggest a musical score without crowding the center UI. -->
+  <g stroke="#D7E5C5" stroke-opacity=".16" stroke-width="1.4">
+    <path d="M-90 188C210 120 426 242 720 181S1210 119 1530 188" />
+    <path d="M-90 204C210 136 426 258 720 197S1210 135 1530 204" />
+    <path d="M-90 220C210 152 426 274 720 213S1210 151 1530 220" />
+    <path d="M-90 236C210 168 426 290 720 229S1210 167 1530 236" />
+    <path d="M-90 252C210 184 426 306 720 245S1210 183 1530 252" />
+  </g>
+
+  <!-- Sparse note shapes sit toward the edges as decorative accents. -->
+  <g fill="#C9F36B" fill-opacity=".24" stroke="#C9F36B" stroke-opacity=".24" stroke-width="3" stroke-linecap="round">
+    <ellipse cx="210" cy="320" rx="12" ry="8" transform="rotate(-22 210 320)" />
+    <path d="M221 316V260" />
+    <ellipse cx="1240" cy="330" rx="12" ry="8" transform="rotate(-22 1240 330)" />
+    <path d="M1251 326V270" />
+    <ellipse cx="1290" cy="782" rx="12" ry="8" transform="rotate(-22 1290 782)" />
+    <path d="M1301 778V722" />
+  </g>
+
+  <!-- An abstract equalizer waveform adds a subtle audio-processing motif. -->
+  <g stroke="url(#wave)" stroke-opacity=".28" stroke-width="3" stroke-linecap="round">
+    <path d="M80 585V625M112 557V653M144 532V678M176 568V642M208 548V662M240 515V695M272 552V658M304 578V632M336 540V670M368 518V692M400 566V644M432 548V662M464 506V704M496 542V668M528 575V635M560 550V660M592 522V688M624 560V650M656 535V675M688 505V705M720 550V660M752 574V636M784 535V675M816 515V695M848 557V653M880 530V680M912 502V708M944 546V664M976 575V635M1008 540V670M1040 518V692M1072 558V652M1104 530V680M1136 510V700M1168 548V662M1200 575V635M1232 540V670M1264 516V694M1296 558V652M1328 532V678M1360 574V636" />
+  </g>
+</svg>
