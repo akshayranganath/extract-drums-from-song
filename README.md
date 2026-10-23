@@ -10,6 +10,7 @@ CLI/                  Python command-line backend
   __init__.py
 electron/              Electron main process, preload bridge, and renderer UI
 tests/                 Python unit tests
+docs/screenshots/      README images
 AGENTS.md              Canonical instructions for coding agents
 pyproject.toml         Python project and uv dependencies
 package.json           Electron scripts and dependencies
@@ -43,6 +44,10 @@ npm start
 
 `npm start` runs `electron .` and loads `electron/main.cjs`. It is the only launch script; there is no separate `dev` script, and the app has no build step, so edit the files under `electron/` and restart to see changes. `npm run check` syntax-checks the Electron sources.
 
+![Initial Drum Extract window](docs/screenshots/01-start.png)
+
+*The app before selecting a song.*
+
 Then, in the window:
 
 1. **Pick a song.** Drag an MP3 onto the drop zone, or click **Choose MP3** to open a file dialog. Only `.mp3` files are accepted; video files are rejected.
@@ -50,6 +55,20 @@ Then, in the window:
 3. **Separate.** Click **Separate audio**. A save dialog opens first, pre-filled with `<song>_drums.mp3` or `<song>_no_drums.mp3` beside the input; pick a location and confirm. Cancelling the save dialog aborts without processing.
 4. **Wait.** The progress bar follows Demucs inference, holds at 97% while FFmpeg encodes, and reaches 100% only after the final MP3 has been written. The first run downloads the `htdemucs` model, which takes a little longer. Click **Cancel** to stop an in-progress separation; nothing is written when you cancel.
 5. **Listen.** Click **Open result in VLC** to play the saved MP3. VLC must be installed.
+
+### What it looks like
+
+![MP3 selected and ready to separate](docs/screenshots/02-file-selected.png)
+
+*An MP3 is selected and ready to process.*
+
+![Separation in progress](docs/screenshots/03-separating.png)
+
+*Demucs is running; the Cancel button is available.*
+
+![Separation complete](docs/screenshots/04-complete.png)
+
+*The completed MP3 can be opened in VLC.*
 
 The app always uses `--device auto` (CUDA, then Apple Metal/MPS, then CPU) and falls back to CPU automatically if the GPU run fails. On an Apple Silicon Mac a four-minute song takes roughly 20 seconds on MPS versus over a minute on CPU.
 

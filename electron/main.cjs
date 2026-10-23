@@ -238,7 +238,7 @@ ipcMain.handle('player:open-output', async () => {
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 720,
-    height: 760,
+    height: 870,
     minWidth: 600,
     minHeight: 640,
     title: 'Drum Extract',
